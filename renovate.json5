@@ -1,0 +1,30 @@
+{
+    $schema: "https://docs.renovatebot.com/renovate-schema.json",
+    extends: ["config:recommended"],
+
+    customManagers: [
+        {
+            customType: "regex",
+            description: "Update Maven properties annotated with a renovate comment",
+            // Older Renovate versions: use `fileMatch: ["(^|/)pom\\.xml$"]`
+            managerFilePatterns: ["/(^|/)pom\\.xml$/"],
+            matchStrings: [
+                "<!--\\s*renovate:\\s*datasource=(?<datasource>[a-z-]+?)\\s+depName=(?<depName>\\S+?)(?:\\s+versioning=(?<versioning>\\S+?))?\\s*-->\\s*<[^>]+>(?<currentValue>[^<]+)</",
+            ],
+            versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}maven{{/if}}",
+        },
+    ],
+
+    packageRules: [
+        {
+            description: "Update Keycloak (image) and the dasniko SPI BOM together",
+            matchPackageNames: [
+                "quay.io/keycloak/keycloak",
+                "com.github.dasniko:keycloak-spi-bom",
+            ],
+            groupName: "Keycloak",
+            // gives dasniko time to release the matching BOM
+            minimumReleaseAge: "3 days",
+        },
+    ],
+}
