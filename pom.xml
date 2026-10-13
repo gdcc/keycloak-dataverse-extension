@@ -1,0 +1,129 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>io.gdcc.keycloak</groupId>
+    <artifactId>extension-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    
+    <description>Parent POM for the Keycloak Dataverse users extensions</description>
+    <parent>
+        <groupId>io.gdcc</groupId>
+        <artifactId>parent</artifactId>
+        <version>0.15.3</version>
+    </parent>
+    
+    <modules>
+        <module>builtin-users-spi</module>
+    </modules>
+    
+    <properties>
+        <project.github.org>gdcc</project.github.org>
+        <project.github.repo>keycloak-dataverse-extension</project.github.repo>
+        <!-- Should match the Java baseline of the Keycloak server -->
+        <jdk.version>21</jdk.version>
+        
+        <!-- renovate: datasource=docker depName=quay.io/keycloak/keycloak versioning=docker -->
+        <keycloak.version>26.7.2</keycloak.version>
+        <!--
+        Note: dasniko's BOM is aligned with keycloak only on major.minor version.
+              Using a Renovate Bot config to keep them in sync.
+        -->
+        <keycloak-spi-bom.version>26.7.0</keycloak-spi-bom.version>
+        <mockito.version>5.23.0</mockito.version>
+    </properties>
+    
+    <dependencyManagement>
+        <dependencies>
+            <!--
+            Instead of the official Keycloak SPI BOM, use the Dasniko BOM, which also covers internals.
+            See https://github.com/dasniko/keycloak-spi-bom
+            <dependency>
+                <groupId>org.keycloak.bom</groupId>
+                <artifactId>keycloak-spi-bom</artifactId>
+                <version>${keycloak.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            -->
+            <dependency>
+                <groupId>com.github.dasniko</groupId>
+                <artifactId>keycloak-spi-bom</artifactId>
+                <version>${keycloak-spi-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>parse-keycloak-version</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <versionString>${keycloak.version}</versionString>
+                            <!-- yields ${kc.majorVersion}, ${kc.minorVersion}, ${kc.incrementalVersion}, ... -->
+                            <propertyPrefix>kc</propertyPrefix>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-keycloak-bom-alignment</id>
+                        <!-- after validate, so the kc.* properties exist -->
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireProperty>
+                                    <property>keycloak-spi-bom.version</property>
+                                    <!-- full match: same major.minor, any patch/qualifier -->
+                                    <regex>${kc.majorVersion}\.${kc.minorVersion}(\..*)?</regex>
+                                    <regexMessage>keycloak-spi-bom.version (${keycloak-spi-bom.version}) must match major.minor of keycloak.version (${keycloak.version}).</regexMessage>
+                                </requireProperty>
+                            </rules>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- Test if the minimal required bytecode version of Keycloak JARs and dependencies
+                             all match our configured target Java version (if our version is too low, we'll notice) -->
+                        <id>enforce-bytecode-version-matches-keycloak</id>
+                        <!-- needs resolved dependencies, so not in validate/initialize -->
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <enforceBytecodeVersion>
+                                    <maxJdkVersion>${jdk.version}</maxJdkVersion>
+                                    <!-- multi-release JARs often contain newer class files -->
+                                    <ignoredScopes>
+                                        <ignoredScope>test</ignoredScope>
+                                    </ignoredScopes>
+                                </enforceBytecodeVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
