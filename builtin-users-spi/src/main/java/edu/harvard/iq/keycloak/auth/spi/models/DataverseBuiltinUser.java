@@ -2,10 +2,10 @@ package edu.harvard.iq.keycloak.auth.spi.models;
 
 import jakarta.persistence.*;
 
-@NamedQueries({
-        @NamedQuery(name = "DataverseBuiltinUser.findByUsername",
-                query = "SELECT u FROM DataverseBuiltinUser u WHERE LOWER(u.username)=LOWER(:username)")
-})
+import java.util.Objects;
+
+@NamedQuery(name  = "DataverseBuiltinUser.findByUsername",
+            query = "SELECT u FROM DataverseBuiltinUser u WHERE LOWER(u.username)=LOWER(:username)")
 @Entity
 @Table(name = "builtinuser")
 public class DataverseBuiltinUser {
@@ -44,5 +44,18 @@ public class DataverseBuiltinUser {
 
     public String getEncryptedPassword() {
         return encryptedPassword;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof DataverseBuiltinUser that)
+            return Objects.equals(username, that.username) && Objects.equals(encryptedPassword, that.encryptedPassword);
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, encryptedPassword);
     }
 }

@@ -3,13 +3,12 @@ package edu.harvard.iq.keycloak.auth.spi.adapters;
 import edu.harvard.iq.keycloak.auth.spi.models.DataverseUser;
 import edu.harvard.iq.keycloak.auth.spi.providers.DataverseUserStorageProviderFactory;
 import org.keycloak.component.ComponentModel;
-import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.storage.StorageId;
 import org.keycloak.storage.adapter.AbstractUserAdapterFederatedStorage;
 
-import java.util.stream.Stream;
+import java.util.Objects;
 
 public class DataverseUserAdapter extends AbstractUserAdapterFederatedStorage {
 
@@ -27,6 +26,7 @@ public class DataverseUserAdapter extends AbstractUserAdapterFederatedStorage {
 
     @Override
     public void setUsername(String s) {
+        // Intentionally empty, as this adapter does not support setting the username
     }
 
     @Override
@@ -50,22 +50,20 @@ public class DataverseUserAdapter extends AbstractUserAdapterFederatedStorage {
     }
 
     @Override
-    public Stream<GroupModel> getGroupsStream(String search, Integer first, Integer max) {
-        return super.getGroupsStream(search, first, max);
-    }
-
-    @Override
-    public long getGroupsCount() {
-        return super.getGroupsCount();
-    }
-
-    @Override
-    public long getGroupsCountByNameContaining(String search) {
-        return super.getGroupsCountByNameContaining(search);
-    }
-
-    @Override
     public String getId() {
         return keycloakId;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof DataverseUserAdapter that)
+            return keycloakId.equals(that.keycloakId) && Objects.equals(dataverseUser, that.dataverseUser);
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(keycloakId, dataverseUser);
     }
 }
