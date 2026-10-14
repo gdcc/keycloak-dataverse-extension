@@ -14,11 +14,13 @@ import java.util.List;
 public class DataverseUserService {
 
     private static final Logger logger = Logger.getLogger(DataverseUserService.class);
+    // Keep the persistence unit name in sync with builtin-users-spi/src/main/resources/META-INF/persistence.xml!
+    static final String PERSISTENCE_UNIT = "dataverse-pu";
 
     private final EntityManager em;
 
-    public DataverseUserService(KeycloakSession session, String datasource) {
-        this.em = session.getProvider(JpaConnectionProvider.class, datasource).getEntityManager();
+    public DataverseUserService(KeycloakSession session) {
+        this.em = session.getProvider(JpaConnectionProvider.class, PERSISTENCE_UNIT).getEntityManager();
     }
 
     public DataverseUser getUserById(String id) {

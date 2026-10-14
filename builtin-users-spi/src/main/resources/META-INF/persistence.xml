@@ -3,15 +3,24 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
              version="3.0">
-    <persistence-unit name="user-store" transaction-type="JTA">
+    <!--
+        The persistence unit name must be kept in sync with DataverseUserService.java!
+        It cannot be made runtime configurable because of how Keycloak works.
+     -->
+    <persistence-unit name="dataverse-pu" transaction-type="JTA">
         <class>edu.harvard.iq.keycloak.auth.spi.models.DataverseBuiltinUser</class>
         <class>edu.harvard.iq.keycloak.auth.spi.models.DataverseAuthenticatedUser</class>
         <properties>
             <!-- Set the Hibernate dialect for PostgreSQL -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
 
-            <!-- JDBC connection settings -->
-            <property name="hibernate.connection.datasource" value="user-store"/>
+            <!--
+              JDBC connection:
+              1. Using a hardcoded name here, which cannot be made runtime configurable without programmatically
+                 creating a new persistence unit ourselves.
+              2. The source itself is configurable at runtime, see https://www.keycloak.org/server/db#multiple-datasources
+            -->
+            <property name="jakarta.persistence.jtaDataSource" value="dataverse"/>
 
             <!-- Transaction management settings -->
             <property name="jakarta.persistence.transactionType" value="JTA"/>

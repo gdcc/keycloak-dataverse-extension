@@ -12,13 +12,12 @@ import org.keycloak.models.KeycloakSession;
 
 import java.util.Collections;
 
+import static edu.harvard.iq.keycloak.auth.spi.services.DataverseUserService.PERSISTENCE_UNIT;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class DataverseUserServiceTest {
-
-    private static final String TEST_USER_STORE = "user-store";
 
     private EntityManager entityManagerMock;
     private DataverseUserService sut;
@@ -29,10 +28,10 @@ class DataverseUserServiceTest {
         KeycloakSession sessionMock = mock(KeycloakSession.class);
 
         JpaConnectionProvider jpaConnectionProviderMock = mock(JpaConnectionProvider.class);
-        when(sessionMock.getProvider(JpaConnectionProvider.class, TEST_USER_STORE)).thenReturn(jpaConnectionProviderMock);
+        when(sessionMock.getProvider(JpaConnectionProvider.class, PERSISTENCE_UNIT)).thenReturn(jpaConnectionProviderMock);
         when(jpaConnectionProviderMock.getEntityManager()).thenReturn(entityManagerMock);
 
-        sut = new DataverseUserService(sessionMock, TEST_USER_STORE);
+        sut = new DataverseUserService(sessionMock);
     }
 
     @Test
