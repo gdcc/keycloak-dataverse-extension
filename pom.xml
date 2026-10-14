@@ -23,6 +23,8 @@
         <project.github.repo>keycloak-dataverse-extension</project.github.repo>
         <!-- Should match the Java baseline of the Keycloak server -->
         <jdk.version>21</jdk.version>
+        <!-- Quarkus is a Jakarta EE 11 tool! -->
+        <jakarta-ee.version>11.0.0</jakarta-ee.version>
         
         <!-- renovate: datasource=docker depName=quay.io/keycloak/keycloak versioning=docker -->
         <keycloak.version>26.7.2</keycloak.version>
