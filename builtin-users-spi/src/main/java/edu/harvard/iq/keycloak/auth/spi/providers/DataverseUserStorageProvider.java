@@ -74,10 +74,10 @@ public class DataverseUserStorageProvider implements
         DataverseAuthenticationService dataverseAuthenticationService = new DataverseAuthenticationService(dataverseUserService);
         return dataverseAuthenticationService.canLogInAsBuiltinUser(user.getUsername(), userCredential.getValue());
     }
-
+    
     @Override
     public void close() {
-        logger.debug("Closing DataverseUserStorageProvider");
-        this.dataverseUserService.close();
+        // Nothing to do here.
+        // Any EntityManager is owned and closed by Keycloak's JpaConnectionProvider within the services
     }
 }
