@@ -34,6 +34,9 @@
         -->
         <keycloak-spi-bom.version>26.7.0</keycloak-spi-bom.version>
         <mockito.version>5.23.0</mockito.version>
+        <testcontainers.version>2.0.5</testcontainers.version>
+        <pgjdbc.version>42.7.14</pgjdbc.version>
+        <postgresql.version>17</postgresql.version>
     </properties>
     
     <dependencyManagement>
@@ -55,6 +58,20 @@
                 <version>${keycloak-spi-bom.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- (Conveniently managed by the dasniko BOM as well, keeping things nicely in sync)
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            -->
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${pgjdbc.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
